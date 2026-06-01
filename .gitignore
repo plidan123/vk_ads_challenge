@@ -1,0 +1,16 @@
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# PyCharm / IntelliJ
+.idea/
+*.iml
+
+# Generated predictions
+replay_validate_predictions.tsv
+shift_replay_predictions.tsv
