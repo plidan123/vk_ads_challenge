@@ -50,8 +50,8 @@
 
 Текущий ML-baseline:
 - признаки: параметры кампании, агрегаты по аудитории из `users.tsv` и `history.tsv`, агрегаты по площадкам;
-- модели: `Ridge`, `RandomForestRegressor`, `ExtraTreesRegressor`;
-- текущий лучший результат на 5-fold CV: `ExtraTreesRegressor`, метрика `24.89`.
+- модели: `Ridge`, `RandomForestRegressor`, `ExtraTreesRegressor`, `GradientBoostingRegressor`, `HistGradientBoostingRegressor`;
+- текущий лучший результат на 5-fold CV: `HistGradientBoostingRegressor`, метрика `22.17`.
 
 ### 7. Улучшение модельного блока
 - Перейти к более сильной табличной модели.

@@ -6,7 +6,12 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from sklearn.ensemble import ExtraTreesRegressor, RandomForestRegressor
+from sklearn.ensemble import (
+    ExtraTreesRegressor,
+    GradientBoostingRegressor,
+    HistGradientBoostingRegressor,
+    RandomForestRegressor,
+)
 from sklearn.linear_model import Ridge
 from sklearn.model_selection import KFold
 from sklearn.multioutput import MultiOutputRegressor
@@ -168,6 +173,20 @@ def make_models() -> dict[str, object]:
             min_samples_leaf=2,
             random_state=RANDOM_STATE,
             n_jobs=-1,
+        ),
+        "gradient_boosting": GradientBoostingRegressor(
+            n_estimators=250,
+            learning_rate=0.03,
+            max_depth=3,
+            min_samples_leaf=5,
+            random_state=RANDOM_STATE,
+        ),
+        "hist_gradient_boosting": HistGradientBoostingRegressor(
+            max_iter=250,
+            learning_rate=0.03,
+            max_leaf_nodes=15,
+            l2_regularization=0.05,
+            random_state=RANDOM_STATE,
         ),
     }
 
