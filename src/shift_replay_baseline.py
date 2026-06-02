@@ -25,6 +25,11 @@ def shifted_row(row: pd.Series, shift_hours: int) -> pd.Series:
     return shifted
 
 
+def replay_shifted_row(row: pd.Series, history: pd.DataFrame, shift_hours: int) -> tuple[float, float, float]:
+    available_history = history[history["hour"] < row["hour_start"]]
+    return replay_row(shifted_row(row, shift_hours), available_history)
+
+
 def main() -> None:
     history = pd.read_csv(ROOT / "history.tsv", sep="\t")
     validate = pd.read_csv(ROOT / "validate.tsv", sep="\t")
@@ -36,7 +41,7 @@ def main() -> None:
     )
 
     predictions = validate.apply(
-        lambda row: replay_row(shifted_row(row, MONTH_SHIFT_HOURS), history),
+        lambda row: replay_shifted_row(row, history, MONTH_SHIFT_HOURS),
         axis=1,
         result_type="expand",
     )
