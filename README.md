@@ -1,5 +1,29 @@
 # VK CUP
 
+## Структура проекта
+
+```text
+data/raw/                  исходные таблицы задачи
+data/features/             сохраненные признаки для моделей
+artifacts/predictions/     сохраненные предсказания baseline и финальной модели
+src/features.py            построение признаков кампаний
+src/replay.py              восстановление сессий и replay-симуляция аукциона
+src/train_replay_calibration.py
+                           финальная residual-калибровка replay-прогноза
+src/metrics.py             официальная метрика
+src/paths.py               общие пути проекта
+experiments/               необязательные ML-эксперименты, не финальный pipeline
+experiments/build_feature_selection_artifacts.py
+                           пересчет таблиц для feature_selection.ipynb
+notebooks/data_analysis.ipynb
+                           первичный анализ данных
+notebooks/feature_selection.ipynb
+                           анализ отбора признаков и моделей
+notebooks/vk_ads_defense.ipynb
+                           основной ноутбук для защиты
+baselines/                 простые baseline-решения
+```
+
 ### Описание задачи -- Vk Ads Auction Forecasting Challenge
 
 Реклама ВКонтакте работает по тем же принципам, что и большинство рекламных систем – на основе аукциона (тут можно ссылку на мой доклад из VK Tech). Чем больше рекламодатель готов заплатить за показ рекламы пользователю – тем больше людей увидят его рекламу.   
@@ -57,7 +81,7 @@ $$ 100\% \cdot \left( \exp \left( \frac{1}{n} \sum_{i=1}^{n}\left|\log\left(\fra
 
 $\epsilon = 0.005$
 
-![metric formula](metric.png "формула в виде картинки")
+![metric formula](data/raw/metric.png "формула в виде картинки")
 
 EPS = 0.005
 
