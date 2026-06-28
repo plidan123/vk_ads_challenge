@@ -16,5 +16,4 @@ replay_validate_predictions.tsv
 shift_replay_predictions.tsv
 ml_baseline*_predictions.tsv
 catboost_optuna_predictions.tsv
-features_*.tsv
 ml_baseline_predictions.tsv
