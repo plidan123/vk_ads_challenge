@@ -1,8 +1,6 @@
 from __future__ import annotations
 
 import argparse
-import sys
-from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -19,21 +17,30 @@ except ImportError:
     CatBoostRegressor = None
 
 
-ROOT = Path(__file__).resolve().parents[1]
-sys.path.append(str(ROOT))
-sys.path.append(str(ROOT / "src"))
-
-from metrics import get_smoothed_mean_log_accuracy_ratio  # noqa: E402
-from paths import DATA_FEATURES, DATA_RAW, PREDICTIONS  # noqa: E402
-from features import (  # noqa: E402
-    EPSILON,
-    RANDOM_STATE,
-    TARGET_COLUMNS,
-    append_replay_feature_file,
-    prepare_features_for_tasks,
-    read_tsv,
-    transform_target,
-)
+try:
+    from src.metrics import get_smoothed_mean_log_accuracy_ratio
+    from src.paths import DATA_FEATURES, DATA_RAW, PREDICTIONS
+    from src.features import (
+        EPSILON,
+        RANDOM_STATE,
+        TARGET_COLUMNS,
+        append_replay_feature_file,
+        prepare_features_for_tasks,
+        read_tsv,
+        transform_target,
+    )
+except ModuleNotFoundError:
+    from metrics import get_smoothed_mean_log_accuracy_ratio
+    from paths import DATA_FEATURES, DATA_RAW, PREDICTIONS
+    from features import (
+        EPSILON,
+        RANDOM_STATE,
+        TARGET_COLUMNS,
+        append_replay_feature_file,
+        prepare_features_for_tasks,
+        read_tsv,
+        transform_target,
+    )
 
 
 REPLAY_COLUMNS = {

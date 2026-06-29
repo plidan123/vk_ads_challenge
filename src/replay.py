@@ -2,18 +2,17 @@ from __future__ import annotations
 
 import argparse
 from pathlib import Path
-import sys
 
 import numpy as np
 import pandas as pd
 
 
-ROOT = Path(__file__).resolve().parents[1]
-sys.path.append(str(ROOT))
-sys.path.append(str(ROOT / "src"))
-
-from metrics import get_smoothed_mean_log_accuracy_ratio  # noqa: E402
-from paths import DATA_RAW, PREDICTIONS  # noqa: E402
+try:
+    from src.metrics import get_smoothed_mean_log_accuracy_ratio
+    from src.paths import DATA_RAW, PREDICTIONS
+except ModuleNotFoundError:
+    from metrics import get_smoothed_mean_log_accuracy_ratio
+    from paths import DATA_RAW, PREDICTIONS
 
 
 MONTH_SHIFT_HOURS = 31 * 24

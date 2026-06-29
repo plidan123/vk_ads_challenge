@@ -1,7 +1,7 @@
 model	metric
-catboost	12.35
-extra_trees	12.7
-gradient_boosting	12.94
-random_forest	13.65
-hist_gradient_boosting	14.47
-ridge	27.77
+catboost	15.25
+hist_gradient_boosting	17.19
+gradient_boosting	19.81
+extra_trees	21.67
+random_forest	24.16
+ridge	35.97

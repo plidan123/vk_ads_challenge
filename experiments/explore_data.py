@@ -6,9 +6,12 @@ from pathlib import Path
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.append(str(ROOT / "src"))
+sys.path.insert(0, str(ROOT))
 
-from paths import DATA_RAW
+try:
+    from src.paths import DATA_RAW
+except ModuleNotFoundError:
+    from paths import DATA_RAW
 
 
 def read_tsv(name: str) -> pd.DataFrame:

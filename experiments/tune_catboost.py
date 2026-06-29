@@ -11,20 +11,32 @@ from sklearn.multioutput import MultiOutputRegressor
 
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.append(str(ROOT))
-sys.path.append(str(ROOT / "src"))
+sys.path.insert(0, str(ROOT))
 
-from metrics import get_smoothed_mean_log_accuracy_ratio  # noqa: E402
-from paths import DATA_RAW, PREDICTIONS  # noqa: E402
-from features import (  # noqa: E402
-    RANDOM_STATE,
-    TARGET_COLUMNS,
-    inverse_transform_target,
-    append_replay_feature_file,
-    prepare_features_for_tasks,
-    read_tsv,
-    transform_target,
-)
+try:
+    from src.metrics import get_smoothed_mean_log_accuracy_ratio
+    from src.paths import DATA_RAW, PREDICTIONS
+    from src.features import (
+        RANDOM_STATE,
+        TARGET_COLUMNS,
+        inverse_transform_target,
+        append_replay_feature_file,
+        prepare_features_for_tasks,
+        read_tsv,
+        transform_target,
+    )
+except ModuleNotFoundError:
+    from metrics import get_smoothed_mean_log_accuracy_ratio
+    from paths import DATA_RAW, PREDICTIONS
+    from features import (
+        RANDOM_STATE,
+        TARGET_COLUMNS,
+        inverse_transform_target,
+        append_replay_feature_file,
+        prepare_features_for_tasks,
+        read_tsv,
+        transform_target,
+    )
 
 
 def get_time_split_indices(tasks: pd.DataFrame, valid_fraction: float) -> tuple[pd.Index, pd.Index]:
@@ -84,6 +96,11 @@ def main() -> None:
     parser.add_argument("--predict-features", default=None, type=Path)
     parser.add_argument("--replay-features", default=None, type=Path)
     parser.add_argument("--predict-replay-features", default=None, type=Path)
+    parser.add_argument(
+        "--importance-output",
+        default=ROOT / "artifacts" / "experiments" / "optuna_hyperparameter_importance.tsv",
+        type=Path,
+    )
     parser.add_argument("--trials", default=20, type=int)
     parser.add_argument("--time-valid-fraction", default=0.2, type=float)
     args = parser.parse_args()
@@ -136,6 +153,17 @@ def main() -> None:
     print("Best params:")
     for key, value in study.best_params.items():
         print(f"  {key}: {value}")
+
+    importances = optuna.importance.get_param_importances(study)
+    importance_frame = pd.DataFrame(
+        {
+            "hyperparameter": list(importances.keys()),
+            "importance": list(importances.values()),
+        }
+    )
+    args.importance_output.parent.mkdir(parents=True, exist_ok=True)
+    importance_frame.to_csv(args.importance_output, sep="\t", index=False)
+    print(f"Saved hyperparameter importances to: {args.importance_output}")
 
     model = MultiOutputRegressor(make_catboost(study.best_params))
     model.fit(train_features, transform_target(answers))

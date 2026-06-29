@@ -25,20 +25,34 @@ except ImportError:
 
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.append(str(ROOT / "src"))
+sys.path.insert(0, str(ROOT))
 
-from features import (  # noqa: E402
-    EPSILON,
-    RANDOM_STATE,
-    TARGET_COLUMNS,
-    append_replay_feature_file,
-    inverse_transform_target,
-    read_tsv,
-    transform_target,
-)
-from metrics import get_smoothed_mean_log_accuracy_ratio  # noqa: E402
-from paths import DATA_FEATURES, DATA_RAW, PREDICTIONS  # noqa: E402
-from train_replay_calibration import evaluate_time_split as evaluate_calibration_time_split  # noqa: E402
+try:
+    from src.features import (
+        EPSILON,
+        RANDOM_STATE,
+        TARGET_COLUMNS,
+        append_replay_feature_file,
+        inverse_transform_target,
+        read_tsv,
+        transform_target,
+    )
+    from src.metrics import get_smoothed_mean_log_accuracy_ratio
+    from src.paths import DATA_FEATURES, DATA_RAW, PREDICTIONS
+    from src.train_replay_calibration import evaluate_time_split as evaluate_calibration_time_split
+except ModuleNotFoundError:
+    from features import (
+        EPSILON,
+        RANDOM_STATE,
+        TARGET_COLUMNS,
+        append_replay_feature_file,
+        inverse_transform_target,
+        read_tsv,
+        transform_target,
+    )
+    from metrics import get_smoothed_mean_log_accuracy_ratio
+    from paths import DATA_FEATURES, DATA_RAW, PREDICTIONS
+    from train_replay_calibration import evaluate_time_split as evaluate_calibration_time_split
 
 
 REPLAY_COLUMNS = [
@@ -315,29 +329,42 @@ def main() -> None:
     args.output_dir.mkdir(parents=True, exist_ok=True)
     tasks = read_tsv(args.tasks)
     answers = read_tsv(args.answers)[TARGET_COLUMNS]
-    features = append_replay_feature_file(read_tsv(args.features), args.replay_features)
+    base_features = read_tsv(args.features)
+    features = append_replay_feature_file(base_features, args.replay_features)
     train_index, _ = get_time_split_indices(tasks, args.time_valid_fraction)
 
-    ranked_features = rank_features(features, answers, train_index)
-
-    feature_results = evaluate_feature_sets(
-        features,
+    ranked_standalone_features = rank_features(base_features, answers, train_index)
+    standalone_feature_results = evaluate_feature_sets(
+        base_features,
         answers,
         tasks,
-        ranked_features,
+        ranked_standalone_features,
         args.time_valid_fraction,
     )
-    feature_results.to_csv(args.output_dir / "feature_selection_results.tsv", sep="\t", index=False)
+    standalone_feature_results.to_csv(
+        args.output_dir / "ml_feature_selection_results.tsv",
+        sep="\t",
+        index=False,
+    )
 
-    selected_feature_set = str(feature_results.iloc[0]["feature_set"])
-    selected_features = build_feature_sets(features, ranked_features)[selected_feature_set]
+    selected_standalone_set = str(standalone_feature_results.iloc[0]["feature_set"])
+    selected_standalone_features = build_feature_sets(
+        base_features,
+        ranked_standalone_features,
+    )[selected_standalone_set]
     (args.output_dir / "selected_features.txt").write_text(
-        "\n".join(selected_features) + "\n",
+        "\n".join(selected_standalone_features) + "\n",
         encoding="utf-8",
     )
-    selected_table = pd.DataFrame({"feature": selected_features})
-    selected_table["group"] = selected_table["feature"].map(feature_group)
-    selected_table.to_csv(args.output_dir / "selected_features_table.tsv", sep="\t", index=False)
+    selected_standalone_table = pd.DataFrame({"feature": selected_standalone_features})
+    selected_standalone_table["group"] = selected_standalone_table["feature"].map(feature_group)
+    selected_standalone_table.to_csv(
+        args.output_dir / "selected_features_table.tsv",
+        sep="\t",
+        index=False,
+    )
+
+    ranked_features = rank_features(features, answers, train_index)
 
     calibration_results = evaluate_calibration_feature_sets(
         features,
@@ -363,10 +390,10 @@ def main() -> None:
     )
 
     model_metrics = evaluate_model_metrics(
-        features,
+        base_features,
         answers,
         tasks,
-        selected_features,
+        selected_standalone_features,
         args.time_valid_fraction,
     )
     model_metrics.to_csv(args.output_dir / "model_metrics.tsv", sep="\t", index=False)

@@ -1,0 +1,8 @@
+hyperparameter	importance
+depth	0.401
+iterations	0.265
+min_data_in_leaf	0.118
+learning_rate	0.104
+l2_leaf_reg	0.061
+bagging_temperature	0.037
+random_strength	0.014

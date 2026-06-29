@@ -1,19 +1,18 @@
 from __future__ import annotations
 
 import argparse
-import sys
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 
 
-ROOT = Path(__file__).resolve().parents[1]
-sys.path.append(str(ROOT))
-sys.path.append(str(ROOT / "src"))
-
-from paths import DATA_FEATURES, DATA_RAW  # noqa: E402
-from replay import MONTH_SHIFT_HOURS, add_sessions, replay_shifted_row  # noqa: E402
+try:
+    from src.paths import DATA_FEATURES, DATA_RAW
+    from src.replay import MONTH_SHIFT_HOURS, add_sessions, replay_shifted_row
+except ModuleNotFoundError:
+    from paths import DATA_FEATURES, DATA_RAW
+    from replay import MONTH_SHIFT_HOURS, add_sessions, replay_shifted_row
 
 
 TARGET_COLUMNS = ["at_least_one", "at_least_two", "at_least_three"]

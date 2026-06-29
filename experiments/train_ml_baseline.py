@@ -17,20 +17,32 @@ except ImportError:
 
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.append(str(ROOT))
-sys.path.append(str(ROOT / "src"))
+sys.path.insert(0, str(ROOT))
 
-from features import (  # noqa: E402
-    RANDOM_STATE,
-    TARGET_COLUMNS,
-    append_replay_feature_file,
-    inverse_transform_target,
-    prepare_features_for_tasks,
-    read_tsv,
-    transform_target,
-)
-from metrics import get_smoothed_mean_log_accuracy_ratio  # noqa: E402
-from paths import DATA_RAW, PREDICTIONS  # noqa: E402
+try:
+    from src.features import (
+        RANDOM_STATE,
+        TARGET_COLUMNS,
+        append_replay_feature_file,
+        inverse_transform_target,
+        prepare_features_for_tasks,
+        read_tsv,
+        transform_target,
+    )
+    from src.metrics import get_smoothed_mean_log_accuracy_ratio
+    from src.paths import DATA_RAW, PREDICTIONS
+except ModuleNotFoundError:
+    from features import (
+        RANDOM_STATE,
+        TARGET_COLUMNS,
+        append_replay_feature_file,
+        inverse_transform_target,
+        prepare_features_for_tasks,
+        read_tsv,
+        transform_target,
+    )
+    from metrics import get_smoothed_mean_log_accuracy_ratio
+    from paths import DATA_RAW, PREDICTIONS
 
 
 def make_ml_models() -> dict[str, object]:
